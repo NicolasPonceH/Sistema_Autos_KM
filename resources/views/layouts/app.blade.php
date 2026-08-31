@@ -1,117 +1,143 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('titulo', 'Sistema Autos KM')</title>
-    @fonts
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('titulo', 'AutoTrack — PDI Fleet Control')</title>
+    
+    {{-- Google Fonts Oficiales de AutoTrack PDI --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
-<body class="antialiased">
-    <header class="border-b border-border bg-surface">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-accent">
-                    <path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0M5 17V9.5a1 1 0 0 1 .3-.71l3-3A1 1 0 0 1 9 5.5h6a1 1 0 0 1 .7.29l3 3a1 1 0 0 1 .3.71V17M8 12h8" />
-                </svg>
-                Sistema Autos KM
+<body class="bg-background font-body-md text-on-background min-h-full flex flex-col antialiased">
+    {{-- Header Oficial AutoTrack PDI --}}
+    <header class="fixed top-0 left-0 right-0 h-20 bg-primary z-50 flex items-center justify-between px-4 sm:px-8 shadow-lg">
+        <div class="flex items-center gap-6">
+            {{-- Logo y Nombre Oficial PDI --}}
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3.5 group">
+                <img src="{{ asset('img/pdi-logo.png') }}" alt="Logo PDI" class="h-10 w-auto brightness-0 invert transition-transform group-hover:scale-105" />
+                <div>
+                    <div class="text-white font-headline-md text-headline-md leading-none">AutoTrack</div>
+                    <div class="text-on-primary-container font-label-mono text-xs tracking-tighter uppercase mt-0.5">PDI Fleet Control</div>
+                </div>
             </a>
 
-            <button type="button" aria-label="Abrir menú" aria-expanded="false" id="boton-menu-movil"
-                    class="rounded-md p-1.5 text-text-muted hover:bg-surface-muted sm:hidden"
-                    onclick="const p=document.getElementById('nav-movil'); const abierto=p.classList.toggle('abierto'); this.setAttribute('aria-expanded', abierto);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" class="h-5 w-5">
-                    <path d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-
-            <nav class="hidden items-center gap-1 sm:flex">
-                <x-nav-link route="dashboard" pattern="dashboard">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 13h4v8H3zM10 8h4v13h-4zM17 3h4v18h-4z" />
-                        </svg>
-                    </x-slot:icon>
+            {{-- Navegación Desktop --}}
+            <nav class="hidden md:flex items-center h-20 ml-6 gap-2">
+                <a href="{{ route('dashboard') }}"
+                   class="transition-colors h-full flex items-center px-3.5 {{ request()->routeIs('dashboard') ? 'border-b-4 border-secondary-fixed text-white font-bold' : 'text-primary-fixed hover:text-white' }}">
                     Dashboard
-                </x-nav-link>
-                <x-nav-link route="vehiculos.index" pattern="vehiculos.*">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0M5 17V9.5a1 1 0 0 1 .3-.71l3-3A1 1 0 0 1 9 5.5h6a1 1 0 0 1 .7.29l3 3a1 1 0 0 1 .3.71V17" />
-                        </svg>
-                    </x-slot:icon>
+                </a>
+                <a href="{{ route('vehiculos.index') }}"
+                   class="transition-colors h-full flex items-center px-3.5 {{ request()->routeIs('vehiculos.*') ? 'border-b-4 border-secondary-fixed text-white font-bold' : 'text-primary-fixed hover:text-white' }}">
                     Vehículos
-                </x-nav-link>
-                <x-nav-link route="planes-mantencion.index" pattern="planes-mantencion.*">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M14.7 6.3a4 4 0 0 1-5.6 5.6L4 17l3 3 5.1-5.1a4 4 0 0 1 5.6-5.6L15 12l-3-3 2.7-2.7Z" />
-                        </svg>
-                    </x-slot:icon>
-                    Planes de mantención
-                </x-nav-link>
-                <x-nav-link route="reportes.km" pattern="reportes.*">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 17l5-5 4 4 8-8M20 8h-4v4" />
-                        </svg>
-                    </x-slot:icon>
-                    Reporte de km
-                </x-nav-link>
+                </a>
+                <a href="{{ route('planes-mantencion.index') }}"
+                   class="transition-colors h-full flex items-center px-3.5 {{ request()->routeIs('planes-mantencion.*') ? 'border-b-4 border-secondary-fixed text-white font-bold' : 'text-primary-fixed hover:text-white' }}">
+                    Planes de Mantención
+                </a>
+                <a href="{{ route('reportes.km') }}"
+                   class="transition-colors h-full flex items-center px-3.5 {{ request()->routeIs('reportes.*') ? 'border-b-4 border-secondary-fixed text-white font-bold' : 'text-primary-fixed hover:text-white' }}">
+                    Reportes de KM
+                </a>
             </nav>
         </div>
 
-        <nav id="nav-movil" class="acordeon border-t border-border sm:hidden">
-            <div class="flex flex-col gap-1 px-4 py-3">
-                <x-nav-link route="dashboard" pattern="dashboard" :mobile="true">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 13h4v8H3zM10 8h4v13h-4zM17 3h4v18h-4z" />
-                        </svg>
-                    </x-slot:icon>
-                    Dashboard
-                </x-nav-link>
-                <x-nav-link route="vehiculos.index" pattern="vehiculos.*" :mobile="true">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0M5 17V9.5a1 1 0 0 1 .3-.71l3-3A1 1 0 0 1 9 5.5h6a1 1 0 0 1 .7.29l3 3a1 1 0 0 1 .3.71V17" />
-                        </svg>
-                    </x-slot:icon>
-                    Vehículos
-                </x-nav-link>
-                <x-nav-link route="planes-mantencion.index" pattern="planes-mantencion.*" :mobile="true">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M14.7 6.3a4 4 0 0 1-5.6 5.6L4 17l3 3 5.1-5.1a4 4 0 0 1 5.6-5.6L15 12l-3-3 2.7-2.7Z" />
-                        </svg>
-                    </x-slot:icon>
-                    Planes de mantención
-                </x-nav-link>
-                <x-nav-link route="reportes.km" pattern="reportes.*" :mobile="true">
-                    <x-slot:icon>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 17l5-5 4 4 8-8M20 8h-4v4" />
-                        </svg>
-                    </x-slot:icon>
-                    Reporte de km
-                </x-nav-link>
+        {{-- Acciones y Perfil --}}
+        <div class="flex items-center gap-4 sm:gap-6">
+            <button type="button" onclick="openQuickOdometroModal()"
+                    class="hidden lg:flex items-center gap-1.5 bg-surface-container-lowest text-primary px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-fixed transition-colors shadow-xs cursor-pointer">
+                <span class="material-symbols-outlined text-[18px]">speed</span>
+                <span>+ Odómetro</span>
+            </button>
+
+            <div class="hidden sm:flex gap-3 border-r border-primary-container/60 pr-5">
+                <button type="button" class="material-symbols-outlined text-primary-fixed hover:text-white transition-colors cursor-pointer" title="Notificaciones">
+                    notifications
+                </button>
             </div>
-        </nav>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden lg:block">
+                    <p class="text-sm font-bold text-white leading-tight">Oficial PDI</p>
+                    <p class="text-xs text-on-primary-container leading-tight">RM Santiago</p>
+                </div>
+                <div class="w-10 h-10 rounded-full border-2 border-secondary-fixed bg-primary-container flex items-center justify-center text-white font-bold shadow-xs">
+                    <span class="material-symbols-outlined text-[22px] text-secondary-fixed">shield_person</span>
+                </div>
+            </div>
+
+            {{-- Botón Móvil --}}
+            <button type="button" aria-label="Abrir menú" id="boton-menu-movil"
+                    class="p-1.5 text-primary-fixed hover:text-white md:hidden cursor-pointer"
+                    onclick="const p=document.getElementById('nav-movil'); p.classList.toggle('hidden');">
+                <span class="material-symbols-outlined text-[28px]">menu</span>
+            </button>
+        </div>
     </header>
 
-    <div class="mx-auto max-w-6xl px-4 py-8">
-        @if (session('status'))
-            <div class="animar-entrada mb-6 flex items-center gap-2 rounded-md bg-success-surface px-4 py-3 text-sm text-success">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 shrink-0">
-                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                {{ session('status') }}
+    {{-- Navegación Móvil Desplegable --}}
+    <nav id="nav-movil" class="fixed top-20 left-0 right-0 z-40 bg-primary border-t border-primary-container hidden md:hidden shadow-xl">
+        <div class="flex flex-col p-4 space-y-2">
+            <a href="{{ route('dashboard') }}" class="px-4 py-2.5 rounded-lg text-sm font-bold {{ request()->routeIs('dashboard') ? 'bg-primary-container text-white' : 'text-primary-fixed' }}">
+                Dashboard
+            </a>
+            <a href="{{ route('vehiculos.index') }}" class="px-4 py-2.5 rounded-lg text-sm font-bold {{ request()->routeIs('vehiculos.*') ? 'bg-primary-container text-white' : 'text-primary-fixed' }}">
+                Vehículos
+            </a>
+            <a href="{{ route('planes-mantencion.index') }}" class="px-4 py-2.5 rounded-lg text-sm font-bold {{ request()->routeIs('planes-mantencion.*') ? 'bg-primary-container text-white' : 'text-primary-fixed' }}">
+                Planes de Mantención
+            </a>
+            <a href="{{ route('reportes.km') }}" class="px-4 py-2.5 rounded-lg text-sm font-bold {{ request()->routeIs('reportes.*') ? 'bg-primary-container text-white' : 'text-primary-fixed' }}">
+                Reportes de KM
+            </a>
+            <div class="pt-2 border-t border-primary-container/60">
+                <button type="button" onclick="openQuickOdometroModal(); document.getElementById('nav-movil').classList.add('hidden');"
+                        class="w-full flex items-center justify-center gap-2 bg-surface-container-lowest text-primary py-2.5 rounded-lg text-xs font-bold">
+                    <span class="material-symbols-outlined text-[18px]">speed</span>
+                    Registrar Odómetro Rápido
+                </button>
             </div>
-        @endif
+        </div>
+    </nav>
 
-        <main>
+    {{-- Contenedor Principal --}}
+    <main class="relative pt-24 min-h-screen bg-surface pb-12 flex-1">
+        <div class="flex flex-col w-full px-4 sm:px-8 py-6 gap-6 max-w-[1280px] mx-auto">
+            @if (session('status'))
+                <div class="animar-entrada flex items-center justify-between rounded-xl bg-status-success/10 border border-status-success/30 p-4 text-status-success shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-status-success">check_circle</span>
+                        <span class="font-medium text-sm text-on-surface">{{ session('status') }}</span>
+                    </div>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-on-surface-variant hover:text-on-surface cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="animar-entrada flex items-center justify-between rounded-xl bg-status-danger/10 border border-status-danger/30 p-4 text-status-danger shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-status-danger">error</span>
+                        <span class="font-medium text-sm text-on-surface">{{ session('error') }}</span>
+                    </div>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-on-surface-variant hover:text-on-surface cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+            @endif
+
             @yield('contenido')
-        </main>
-    </div>
+        </div>
+    </main>
+
+    {{-- Modal de lectura rápida --}}
+    <x-quick-odometro-modal />
 </body>
 </html>
